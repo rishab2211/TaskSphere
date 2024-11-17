@@ -6,12 +6,14 @@ import { toast, Toaster } from 'sonner';
 import React, { useState } from 'react'
 import { apiClient } from '../../lib/api-client';
 import { LOGIN_ROUTE, SIGNUP_ROUTE } from '../../utils/constants';
+import { useNavigate } from 'react-router-dom';
 
 const Auth = () => {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("")
     const [name, setName] = useState("");
+    const navigate = useNavigate();
 
     const Ready = () => {
         setEmail("");
@@ -22,31 +24,44 @@ const Auth = () => {
 
     const validateSignup =()=>{
         if(!name){
-            toast.error("Name is required")
+            toast.error("Name is required");
+            return false;
         }else if(!email){
-            toast.error("Email is required")
+            toast.error("Email is required");
+            return false;
         }else if(!password){
-            toast.error("Password is required")
+            toast.error("Password is required");
+            return false;
         }else if(!confirmPassword){
             toast.error("Confirm Password is required")
+            return false;
         }else if(password!=confirmPassword){
             toast.error("Password and Confirm password is not equal")
+            return false;
         }
+
+        return true;
     }
     const validateLogin =()=>{
         if(!email){
             toast.error("Email is required")
+            return false;
         }else if(!password){
             toast.error("Password is required")
+            return false;
         }
+
+        return true;
     }
 
     const handleSignup= async ()=>{
-        if(validateSignup){
+        if(validateSignup()){
             try{
                 const response = await apiClient.post(SIGNUP_ROUTE,{name,email,password},{withCredentials:true});
                 Ready();
-                toast.success("Signup successful")
+                toast.success("Signup successful");
+                navigate("/todos");
+                
             }catch(err){
                 toast.error(err.message);
             }
@@ -54,11 +69,12 @@ const Auth = () => {
     }
 
     const handleLogin = async()=>{
-        if(validateLogin){
+        if(validateLogin()){
             try{
                 const response = await apiClient.post(LOGIN_ROUTE,{email,password},{withCredentials:true});
                 Ready();
-                toast.success("Login successful")
+                toast.success("Login successful");
+                navigate("/todos");
             }catch(err){
                 toast.error(err.message);
             }
